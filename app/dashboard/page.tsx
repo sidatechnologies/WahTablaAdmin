@@ -7,8 +7,11 @@ import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import ExamAttemptsTable from "@/components/recent-exam";
 import { DashboardHeader } from "@/components/dashboard-header";
+import { useRouter } from 'next/navigation';
+
 
 export default function DashboardPage() {
+  const router = useRouter()
   const { admin, isLoading } = useAuth();
 
   if (isLoading) {

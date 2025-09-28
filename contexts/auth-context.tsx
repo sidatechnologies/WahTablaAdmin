@@ -1,11 +1,12 @@
 // contexts/auth-context.tsx
 'use client';
 
-import React, { createContext, useContext, useEffect, useState } from 'react';
+import React, { createContext, useContext } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { Admin, AuthState } from '@/types/auth';
 
-interface AuthContextType extends AuthState {
+interface AuthContextType extends Omit<AuthState, 'isAuthenticated'> {
+  isAuthenticated: boolean | undefined; // 👈 allow undefined while loading
   logout: () => void;
   refetch: () => void;
 }
@@ -45,7 +46,7 @@ async function getCurrentAdmin(): Promise<Admin | null> {
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const queryClient = useQueryClient();
-  
+
   const {
     data: admin,
     isLoading,
@@ -71,10 +72,18 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
+  // 👇 set undefined until loading finishes
+  let isAuthenticated: boolean | undefined;
+  if (isLoading) {
+    isAuthenticated = undefined;
+  } else {
+    isAuthenticated = !!admin;
+  }
+
   const value: AuthContextType = {
     admin: admin || null,
     isLoading,
-    isAuthenticated: !!admin,
+    isAuthenticated,
     logout,
     refetch,
   };

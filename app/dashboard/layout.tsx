@@ -7,6 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useQueryClient } from '@tanstack/react-query';
 import {
   Home,
   Users,
@@ -36,12 +37,14 @@ export default function DashboardLayout({
 }
 
 function DashboardContent({ children }: { children: React.ReactNode }) {
+  const queryClient = useQueryClient();
   const { admin } = useAuth();
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [isPending, startTransition] = useTransition();
 
   const handleLogout = () => {
     startTransition(async () => {
+      await queryClient.invalidateQueries({ queryKey: ['auth', 'admin'] });
       await logoutAction();
     });
   };

@@ -11,8 +11,10 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { signupAction } from '@/lib/actions/auth';
 import { SignupCredentials } from '@/types/auth';
+import { useQueryClient } from '@tanstack/react-query';
 
 export default function SignupPage() {
+  const queryClient = useQueryClient();
   const [credentials, setCredentials] = useState<SignupCredentials>({
     email: '',
     password: '',
@@ -45,6 +47,7 @@ export default function SignupPage() {
       const result = await signupAction(credentials);
       
       if (result.success) {
+        await queryClient.invalidateQueries({ queryKey: ['auth', 'admin'] });
         router.push('/dashboard');
       } else {
         setError(result.error || 'Signup failed');
