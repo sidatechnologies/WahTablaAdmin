@@ -42,7 +42,7 @@ import { Button } from "@/components/ui/button";
 import { useTransition, useState } from "react";
 import { useAuth } from "@/contexts/auth-context";
 import { Admin } from "@/types/auth";
-import { ArrowLeft } from "lucide-react";
+import { User } from "lucide-react";
 
 interface ProductDataTableProps<TData extends Admin, TValue extends object> {
   columns: ColumnDef<TData, TValue>[];
@@ -75,11 +75,13 @@ const SettingsPageComponents = <TData extends Admin, TValue extends object>({
   // };
 
   return (
-    <div className="w-full flex flex-col justify-center items-start gap-6 px-8 pt-10">
-      <div className="w-full flex flex-col lg:flex-row justify-center items-start gap-10">
+    <div className="w-full flex flex-col justify-center items-start gap-3">
+      <div className="w-full flex flex-col lg:flex-row justify-center items-start gap-3">
         <Card className="w-80 flex flex-col justify-center items-center">
-          <CardHeader className="w-full">
-            <span className="w-40 h-40 rounded-full bg-blue-800" />
+          <CardHeader className="w-full overflow-hidden">
+            <span className="w-30 h-30 rounded-full bg-blue-800 flex items-center justify-center">
+              <User className="text-white w-14 h-14"/>
+            </span>
             <CardTitle className="text-4xl">{admin?.name}</CardTitle>
             <CardDescription className="text-xl">
               {admin?.email}
