@@ -20,6 +20,7 @@ import {
   X,
   LogOut,
   LucideProps,
+  BookCheck,
 } from "lucide-react";
 import React, { useState, useTransition } from "react";
 import { logoutAction } from "@/lib/actions/auth";
@@ -86,17 +87,8 @@ function DashboardContent({ children }: { children: React.ReactNode }) {
                 Navigation
               </h3>
               <SidebarLink href="/dashboard" icon={Home} label="Dashboard" />
+              <SidebarLink href="/dashboard/entrance" icon={BookCheck} label="Entrance" />
               <SidebarLink href="/dashboard/students" icon={Users} label="Students" />
-              {/* <SidebarLink
-                href="/dashboard/reports"
-                icon={FileText}
-                label="Reports"
-              />
-              <SidebarLink
-                href="/dashboard/analytics"
-                icon={Activity}
-                label="Analytics"
-              /> */}
               <SidebarLink
                 href="/dashboard/settings"
                 icon={Settings}

@@ -363,7 +363,7 @@ export default function EntranceExamAttemptsTable() {
     {
       accessorKey: "status",
       header: "Status",
-      cell: ({ row }) => getStatusBadge(row.original.status ? 'passed' : 'failed'),
+      cell: ({ row }) => getStatusBadge(row.original.status),
     },
     {
       accessorKey: "mcqstatus",
