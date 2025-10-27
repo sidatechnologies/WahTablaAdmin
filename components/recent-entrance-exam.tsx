@@ -490,9 +490,9 @@ export default function EntranceExamAttemptsTable() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold">Exam Attempts</h1>
+          <h1 className="text-2xl font-bold">Entrance Exam Attempts</h1>
           <p className="text-muted-foreground">
-            Manage and grade student exam submissions
+            Manage and grade student entrance exam submissions
           </p>
         </div>
       </div>
