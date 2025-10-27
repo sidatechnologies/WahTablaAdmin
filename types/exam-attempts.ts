@@ -64,6 +64,7 @@ export interface EntranceExamAttempt {
   gradedBy: string | null;
   totalMarks: number | null;
   videoUrl: string | null;
+  mcqPassed?: boolean;
 }
 
 export interface ExamAttemptsPagination {
