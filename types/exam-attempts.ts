@@ -47,6 +47,25 @@ export interface ExamAttempt {
   finalExamDetails?: FinalExamDetails;
 }
 
+export interface EntranceExamAttempt {
+  attemptId: number;
+  examId: number;
+  examTitle: string;
+  course: string;
+  year: string;
+  attemptNumber: number;
+  dateTime: string;
+  userId: number;
+  username: string;
+  fullName: string;
+  email: string;
+  status: 'passed' | 'failed' | 'pending';
+  gradedAt: string | null;
+  gradedBy: string | null;
+  totalMarks: number | null;
+  videoUrl: string | null;
+}
+
 export interface ExamAttemptsPagination {
   page: number;
   limit: number;
