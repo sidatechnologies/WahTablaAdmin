@@ -27,7 +27,7 @@ export const useUpdateEntranceExamAttempt = (options?: UseUpdateExamAttemptOptio
     onSuccess,
     onError,
     showToast = true,
-    invalidateQueries = ['exam-attempts']
+    invalidateQueries = ['entrance-exam-attempts']
   } = options || {};
 
   return useMutation<UpdateExamAttemptResult, Error, UpdateExamAttemptRequest>({

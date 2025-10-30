@@ -43,7 +43,6 @@ export default function SignupPage() {
     }
 
     startTransition(async () => {
-      console.log("signup ->", credentials)
       const result = await signupAction(credentials);
       
       if (result.success) {

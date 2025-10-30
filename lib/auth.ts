@@ -48,7 +48,6 @@ const REFRESH_TOKEN_COOKIE = 'refresh_token';
 // Cookie helpers
 export async function setAuthCookies(tokens: AuthTokens) {
   const cookieStore = await cookies();
-  // console.log('tokensssssssssss->>>', tokens)
 
   cookieStore.set(ACCESS_TOKEN_COOKIE, tokens.adminAccessToken, {
     ...COOKIE_OPTIONS,

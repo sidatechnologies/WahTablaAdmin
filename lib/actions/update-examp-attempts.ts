@@ -85,7 +85,6 @@ export async function updateExamAttempt(
     });
 
     const apiResponse: UpdateExamAttemptApiResponse = await response.json();
-    console.log(apiResponse.details)
 
     if (!response.ok) {
       // Handle different error status codes
