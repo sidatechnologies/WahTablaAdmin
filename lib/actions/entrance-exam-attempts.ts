@@ -51,7 +51,7 @@ export async function fetchEntranceExamAttempts(
       },
     });
 
-    // console.log(response.status)
+    console.log({response})
 
     if (!response.ok) {
       // Handle different error status codes

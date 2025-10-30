@@ -12,7 +12,7 @@ import {
   ColumnFiltersState,
   VisibilityState,
 } from "@tanstack/react-table";
-import { useEntrancexamAttempts } from "@/hooks/useEntranceExamAttempts";
+import { useEntranceExamAttempts } from "@/hooks/useEntranceExamAttempts";
 import { EntranceExamAttempt } from "@/types/exam-attempts";
 import {
   Search,
@@ -274,7 +274,9 @@ export default function EntranceExamAttemptsTable() {
   );
   const [isDialogOpen, setIsDialogOpen] = useState(false);
 
-  const { data: queryResult, isLoading, isError, error } = useEntrancexamAttempts();
+  const { data: queryResult, isLoading, isError, error } = useEntranceExamAttempts();
+  console.log({queryResult})
+
   const updateExamAttemptMutation = useUpdateEntranceExamAttempt({
     onSuccess: (data) => {
       console.log("Exam attempt graded successfully:", data);
