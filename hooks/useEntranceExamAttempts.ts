@@ -33,6 +33,12 @@ export function useEntranceExamAttempts(options: UseExamAttemptsOptions = {}) {
     enabled,
     refetchOnMount: true,
     refetchOnWindowFocus: false,
+    refetchInterval: 60 * 60 * 1000, // Refetch every hour (60 minutes * 60 seconds * 1000ms)
+    refetchIntervalInBackground: true, // Continue refetching even when tab is not active
+    staleTime: 30 * 60 * 1000, // Consider data stale after 30 minutes
+    gcTime: 2 * 60 * 60 * 1000, // Keep in cache for 2 hours
+    retry: 3,
+    retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 30000), // Exponential backoff
   });
 }
 

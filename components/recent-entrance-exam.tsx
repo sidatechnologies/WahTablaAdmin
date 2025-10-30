@@ -275,7 +275,6 @@ export default function EntranceExamAttemptsTable() {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
 
   const { data: queryResult, isLoading, isError, error } = useEntranceExamAttempts();
-  console.log({queryResult})
 
   const updateExamAttemptMutation = useUpdateEntranceExamAttempt({
     onSuccess: (data) => {
