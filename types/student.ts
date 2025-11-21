@@ -16,6 +16,7 @@ export interface Student {
   hasPurchases: boolean;
   purchasedDetails: any | null
   analytics: any | null
+  currency: string
 }
 
 export interface StudentsPagination {

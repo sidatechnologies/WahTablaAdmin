@@ -180,10 +180,10 @@ const StudentsTable = () => {
     });
   };
 
-  const formatCurrency = (amount: number) => {
+  const formatCurrency = (amount: number, currency: string) => {
     return new Intl.NumberFormat('en-IN', {
       style: 'currency',
-      currency: 'INR',
+      currency: currency,
       minimumFractionDigits: 0
     }).format(amount);
   };
@@ -308,7 +308,7 @@ const StudentsTable = () => {
       ),
       cell: ({ row }) => (
         <div className="text-right font-medium text-green-600">
-          {formatCurrency(row.getValue('totalSpent'))}
+          {formatCurrency(row.getValue('totalSpent'), row.original.currency)}
         </div>
       ),
     },
@@ -422,7 +422,20 @@ const StudentsTable = () => {
   // Statistics
   const totalStudents = studentUsers.length;
   const completedProfiles = studentUsers.filter(s => s.profileCompleted).length;
-  const totalRevenue = studentUsers.reduce((sum, s) => sum + s.totalSpent, 0);
+  const revenueByCurrency: Record<string, number> = studentUsers.reduce(
+    (acc: Record<string, number>, user: any) => {
+      const currency = user.currency ?? "UNKNOWN";
+      const amount = Number(user.totalSpent) || 0;
+
+      if (!acc[currency]) {
+        acc[currency] = 0;
+      }
+
+      acc[currency] += amount;
+      return acc;
+    },
+    {}
+  );
 
   return (
     <div className="p-6 space-y-6">
@@ -452,11 +465,21 @@ const StudentsTable = () => {
         </Card>
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Revenue</CardTitle>
+            <CardTitle className="text-sm font-medium">Total Revenue (USD)</CardTitle>
             <DollarSign className="h-4 w-4 text-green-600" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{formatCurrency(totalRevenue)}</div>
+            <div className="text-2xl font-bold">{formatCurrency(revenueByCurrency['USD'], 'USD')}</div>
+            <p className="text-xs text-gray-500">From all student purchases</p>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Total Revenue (INR)</CardTitle>
+            <DollarSign className="h-4 w-4 text-green-600" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">{formatCurrency(revenueByCurrency['INR'], 'INR')}</div>
             <p className="text-xs text-gray-500">From all student purchases</p>
           </CardContent>
         </Card>
