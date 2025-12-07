@@ -398,12 +398,14 @@ const StudentsTable = () => {
       if (filters.profileCompleted === "incomplete" && student.profileCompleted) return false;
 
       // Orders
-      const minOrders = Number(filters.minOrders);
-      const maxOrders = Number(filters.maxOrders);
-      const totalOrders = Number(student.totalOrders); // <--- cast here
 
-      if (!isNaN(minOrders) && totalOrders < minOrders) return false;
-      if (!isNaN(maxOrders) && totalOrders > maxOrders) return false;
+      // @ts-ignore
+      if (filters.minOrders && student.totalOrders < Number(filters.minOrders)) return false;
+
+      // @ts-ignore
+      if (filters.maxOrders && student.totalOrders > Number(filters.maxOrders)) return false;
+
+
 
 
       // Total Spent
