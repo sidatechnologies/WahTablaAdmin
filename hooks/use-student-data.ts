@@ -26,6 +26,7 @@ export function useStudentsWithUtils() {
 
   return {
     ...query,
+    refetch: query.refetch,
     students: query.data?.success ? query.data.data?.users : [],
     totalUsers: query.data?.success ? query.data.data?.totalUsers : 0,
     usersWithCompleteProfiles: query.data?.success ? query.data.data?.usersWithCompleteProfiles : 0,

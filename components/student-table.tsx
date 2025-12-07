@@ -42,6 +42,7 @@ import {
   DrawerTitle,
   DrawerDescription,
 } from "@/components/ui/drawer";
+import { SelectContent, SelectItem, SelectTrigger, SelectValue, Select } from './ui/select';
 
 // Badge Component
 const Badge = ({ children, variant = 'default', className = '' }: {
@@ -110,7 +111,7 @@ const Input = ({ className = '', ...props }: React.InputHTMLAttributes<HTMLInput
 };
 
 // Select Component
-const Select = ({ children, value, onValueChange, className = '' }: {
+const CSelect = ({ children, value, onValueChange, className = '' }: {
   children: React.ReactNode;
   value: string;
   onValueChange: (value: string) => void;
@@ -151,14 +152,30 @@ const StudentsTable = () => {
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
   const [globalFilter, setGlobalFilter] = useState('');
   const [profileFilter, setProfileFilter] = useState('all');
-  const { data: students, isLoading, error, isError } = useStudentsWithUtils();
+  const { data: students, isLoading, error, isError, refetch } = useStudentsWithUtils();
   const [openDrawer, setOpenDrawer] = useState<number | null>(null);
   const [open, setOpen] = useState(false)
+  const [isDialogOpen, setIsDialogOpen] = React.useState(false);
   const [openDrawerId, setOpenDrawerId] = useState<number | null>(null);
   const [analyticsDrawerOpen, setAnalyticsDrawerOpen] = useState(false)
   const [selectedYear, setSelectedYear] = useState<any>(null)
   const [selectedCourse, setSelectedCourse] = useState<any>(null)
   const [selectedAnalytics, setSelectedAnalytics] = useState<any[]>([])
+
+  const [filters, setFilters] = React.useState({
+    userId: "",
+    username: "",
+    fullName: "",
+    profileCompleted: "all", // all | complete | incomplete
+    minOrders: "",
+    maxOrders: "",
+    minSpent: "",
+    maxSpent: "",
+    registeredFrom: "",
+    registeredTo: "",
+    hasPurchases: "all", // all | yes | no
+  });
+
 
   const handleDialogChange = (isOpen: boolean) => {
     setOpen(isOpen)
@@ -167,7 +184,6 @@ const StudentsTable = () => {
       setOpenDrawer(null)
     }
   }
-
   // fallback empty array to avoid crash before data is ready
   const studentUsers = students?.data?.users ?? [];
 
@@ -357,22 +373,61 @@ const StudentsTable = () => {
     },
   ];
 
-  // const filteredData = React.useMemo(() => {
-  //   let filtered = students;
+  const filteredData = React.useMemo(() => {
+    const list = studentUsers ?? [];
 
-  //   if (profileFilter !== 'all') {
-  //     filtered = filtered.filter(student => {
-  //       if (profileFilter === 'complete') return student.profileCompleted;
-  //       if (profileFilter === 'incomplete') return !student.profileCompleted;
-  //       return true;
-  //     });
-  //   }
+    return list.filter((student) => {
 
-  //   return filtered;
-  // }, [students, profileFilter]);
+      // ID
+      if (filters.userId && !String(student.userId).includes(filters.userId)) {
+        return false;
+      }
+
+      // Username
+      if (filters.username && !student.username.toLowerCase().includes(filters.username.toLowerCase())) {
+        return false;
+      }
+
+      // Full name
+      if (filters.fullName && !student.fullName.toLowerCase().includes(filters.fullName.toLowerCase())) {
+        return false;
+      }
+
+      // Profile Completed
+      if (filters.profileCompleted === "complete" && !student.profileCompleted) return false;
+      if (filters.profileCompleted === "incomplete" && student.profileCompleted) return false;
+
+      // Orders
+      const minOrders = Number(filters.minOrders);
+      const maxOrders = Number(filters.maxOrders);
+      const totalOrders = Number(student.totalOrders); // <--- cast here
+
+      if (!isNaN(minOrders) && totalOrders < minOrders) return false;
+      if (!isNaN(maxOrders) && totalOrders > maxOrders) return false;
+
+
+      // Total Spent
+      if (filters.minSpent && student.totalSpent < Number(filters.minSpent)) return false;
+      if (filters.maxSpent && student.totalSpent > Number(filters.maxSpent)) return false;
+
+      // Registered date range
+      const reg = new Date(student.registeredAt).getTime();
+      if (filters.registeredFrom && reg < new Date(filters.registeredFrom).getTime()) return false;
+      if (filters.registeredTo && reg > new Date(filters.registeredTo).getTime()) return false;
+
+      // Purchase Status
+      if (filters.hasPurchases === "yes" && !student.hasPurchases) return false;
+      if (filters.hasPurchases === "no" && student.hasPurchases) return false;
+
+      return true;
+    });
+
+  }, [studentUsers, filters]);
+
+
 
   const table = useReactTable({
-    data: studentUsers,
+    data: filteredData,
     columns,
     onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,
@@ -397,7 +452,7 @@ const StudentsTable = () => {
     return (
       <div className="flex items-center justify-center h-64">
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
-        <span className="ml-2">Loading exam attempts...</span>
+        <span className="ml-2">Loading student data...</span>
       </div>
     );
   }
@@ -438,7 +493,7 @@ const StudentsTable = () => {
   );
 
   return (
-    <div className="p-6 space-y-6">
+    <div className="w-full space-y-4 rounded-md">
       {/* Statistics Cards */}
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
         <Card>
@@ -502,19 +557,142 @@ const StudentsTable = () => {
               />
             </div>
             <div className="flex gap-2">
-              <Select value={profileFilter} onValueChange={setProfileFilter}>
-                <option value="all">All Profiles</option>
-                <option value="complete">Complete</option>
-                <option value="incomplete">Incomplete</option>
-              </Select>
-              <Button variant="outline" size="sm">
-                <Filter className="h-4 w-4 mr-2" />
-                Filter
-              </Button>
-              <Button variant="outline" size="sm">
-                <RefreshCw className="h-4 w-4 mr-2" />
-                Refresh
-              </Button>
+
+              <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+                <DialogTrigger className='cursor-pointer'>
+                  <Button variant="outline" size="sm">
+                    <Filter className="h-4 w-4 mr-2" />
+                    Filter
+                  </Button>
+                </DialogTrigger>
+                <DialogContent className="sm:max-w-[500px]">
+                  <DialogHeader>
+                    <DialogTitle>Filters</DialogTitle>
+                    <DialogDescription>
+                      Apply various filters to refine the student list.
+                    </DialogDescription>
+                  </DialogHeader>
+
+                  <div className="grid grid-cols-2 gap-4 mt-4">
+
+                    <Input
+                      placeholder="User ID"
+                      value={filters.userId}
+                      onChange={(e) => setFilters({ ...filters, userId: e.target.value })}
+                    />
+
+                    <Input
+                      placeholder="Username"
+                      value={filters.username}
+                      onChange={(e) => setFilters({ ...filters, username: e.target.value })}
+                    />
+
+                    <Input
+                      placeholder="Full Name"
+                      value={filters.fullName}
+                      onChange={(e) => setFilters({ ...filters, fullName: e.target.value })}
+                    />
+
+                    {/* Profile Status */}
+                    <Select
+                      value={filters.profileCompleted}
+                      onValueChange={(v) => setFilters({ ...filters, profileCompleted: v })}
+                    >
+                      <SelectTrigger><SelectValue placeholder="Profile Status" /></SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="all">All</SelectItem>
+                        <SelectItem value="complete">Complete</SelectItem>
+                        <SelectItem value="incomplete">Incomplete</SelectItem>
+                      </SelectContent>
+                    </Select>
+
+                    {/* Orders */}
+                    <Input
+                      placeholder="Min Orders"
+                      type="number"
+                      value={filters.minOrders}
+                      onChange={(e) => setFilters({ ...filters, minOrders: e.target.value })}
+                    />
+
+                    <Input
+                      placeholder="Max Orders"
+                      type="number"
+                      value={filters.maxOrders}
+                      onChange={(e) => setFilters({ ...filters, maxOrders: e.target.value })}
+                    />
+
+                    {/* Total Spent */}
+                    <Input
+                      placeholder="Min Spent"
+                      type="number"
+                      value={filters.minSpent}
+                      onChange={(e) => setFilters({ ...filters, minSpent: e.target.value })}
+                    />
+
+                    <Input
+                      placeholder="Max Spent"
+                      type="number"
+                      value={filters.maxSpent}
+                      onChange={(e) => setFilters({ ...filters, maxSpent: e.target.value })}
+                    />
+
+                    {/* Registered Date Range */}
+                    <Input
+                      type="date"
+                      value={filters.registeredFrom}
+                      onChange={(e) => setFilters({ ...filters, registeredFrom: e.target.value })}
+                    />
+
+                    <Input
+                      type="date"
+                      value={filters.registeredTo}
+                      onChange={(e) => setFilters({ ...filters, registeredTo: e.target.value })}
+                    />
+
+                    {/* Purchase Status */}
+                    <Select
+                      value={filters.hasPurchases}
+                      onValueChange={(v) => setFilters({ ...filters, hasPurchases: v })}
+                    >
+                      <SelectTrigger><SelectValue placeholder="Purchase Status" /></SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="all">All</SelectItem>
+                        <SelectItem value="yes">Has Purchases</SelectItem>
+                        <SelectItem value="no">No Purchases</SelectItem>
+                      </SelectContent>
+                    </Select>
+
+                  </div>
+
+                  <div className="flex justify-end gap-2 mt-6">
+                    <Button
+                      variant="outline"
+                      onClick={() =>
+                        setFilters({
+                          userId: "",
+                          username: "",
+                          fullName: "",
+                          profileCompleted: "all",
+                          minOrders: "",
+                          maxOrders: "",
+                          minSpent: "",
+                          maxSpent: "",
+                          registeredFrom: "",
+                          registeredTo: "",
+                          hasPurchases: "all",
+                        })
+                      }
+                    >
+                      Reset
+                    </Button>
+
+                    <Button onClick={() => {
+                      setIsDialogOpen(false);
+                    }}>Apply Filters</Button>
+                  </div>
+                </DialogContent>
+              </Dialog>
+
             </div>
           </div>
         </CardHeader>
@@ -546,8 +724,6 @@ const StudentsTable = () => {
                       {row.getVisibleCells().map((cell) => (
                         <TableHead key={cell.id} className="p-2">
                           {flexRender(cell.column.columnDef.cell, cell.getContext())}
-
-
                         </TableHead>
                       ))}
                       <Dialog onOpenChange={handleDialogChange}>
